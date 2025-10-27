@@ -140,6 +140,7 @@
           <p><strong>Preço:</strong> R$ ${p.preco}</p>
           <p><strong>Qtd:</strong> ${p.quantidade}</p>
           <p><strong>Status:</strong> ${p.status}</p>
+          <p><strong>Sexo:</strong> ${p.sexo}</p>
           <p><em>${p.descricao || ''}</em></p>
           <button class="editar" onclick="editarProduto(${p.id})">Editar</button>
           <button class="excluir" onclick="excluirProduto(${p.id})">Excluir</button>
@@ -169,6 +170,7 @@
     document.getElementById("quantidade").value = data.quantidade;
     document.getElementById("descricao").value = data.descricao;
     document.getElementById("status").value = data.status;
+    document.getElementById("sexo").value = data.sexo;
 
     // Guardar ID em atributo do form para saber se é edição
     document.getElementById("form-produto").setAttribute("data-edit-id", id);
@@ -186,6 +188,7 @@
     const descricao = document.getElementById("descricao").value;
     const status = document.getElementById("status").value;
     const foto = document.getElementById("foto").files[0];
+    const sexo = document.getElementById("sexo").value;
 
     let imagem_url = null;
     if (foto) {
@@ -201,14 +204,14 @@
     if (editId) {
       // Atualizar
       const { error } = await client.from("produtos").update({
-        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, ...(imagem_url && { imagem_url })
+        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, sexo, ...(imagem_url && { imagem_url })
       }).eq("id", editId);
       if (error) { console.error(error); return; }
       document.getElementById("form-produto").removeAttribute("data-edit-id");
     } else {
       // Inserir novo
       const { error } = await client.from("produtos").insert([{
-        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, imagem_url
+        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, sexo, imagem_url
       }]);
       if (error) { console.error(error); return; }
     }
