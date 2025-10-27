@@ -27,7 +27,6 @@
     <option value="Saias">Saias</option>
     <option value="Sapatos">Sapatos</option>
     <option value="Acessórios">Acessórios</option>
-    <!-- pode adicionar mais conforme sua planilha -->
   </select><br>
   
   Tamanho: <input type="text" id="tamanho"><br>
@@ -47,6 +46,16 @@
 </form>
 
 <h2>Produtos</h2>
+
+<!-- Filtro -->
+<label for="filtro-status">Filtrar por status:</label>
+<select id="filtro-status">
+  <option value="">Todos</option>
+  <option value="disponível">Disponíveis</option>
+  <option value="reservado">Reservados</option>
+  <option value="vendido">Vendidos</option>
+</select>
+
 <div id="lista-produtos" class="grid"></div>
 
 <style>
@@ -58,10 +67,13 @@
   .card {
     border: 1px solid #ddd;
     border-radius: 8px;
-    width: 220px;
+    width: 240px;
     padding: 12px;
     box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
     background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .card img {
     width: 100%;
@@ -80,18 +92,31 @@
     font-size: 0.9em;
     color: #555;
   }
+  .card button {
+    margin-top: 6px;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .editar { background: #ffc107; color: #000; }
+  .excluir { background: #dc3545; color: #fff; }
 </style>
 
 <script src="https://unpkg.com/@supabase/supabase-js"></script>
 <script>
   const SUPABASE_URL = "https://xvathneoefpexbgksmhg.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2YXRobmVvZWZwZXhiZ2tzbWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NzY1NTAsImV4cCI6MjA3NzE1MjU1MH0.xQhovSWNh33BGo256V1-pxOwQ0zjPZ89GpIppD5S1kA";
+  const SUPABASE_ANON_KEY = "SUA-CHAVE-ANON";
   const { createClient } = supabase;
   const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  async function carregarProdutos() {
-    const { data, error } = await client.from("produtos").select("*");
+  async function carregarProdutos(filtroStatus = "") {
+    let query = client.from("produtos").select("*");
+    if (filtroStatus) query = query.eq("status", filtroStatus);
+
+    const { data, error } = await query;
     if (error) { console.error(error); return; }
+
     const lista = document.getElementById("lista-produtos");
     lista.innerHTML = "";
     data.forEach(p => {
@@ -106,11 +131,40 @@
           <p><strong>Qtd:</strong> ${p.quantidade}</p>
           <p><strong>Status:</strong> ${p.status}</p>
           <p><em>${p.descricao || ''}</em></p>
+          <button class="editar" onclick="editarProduto(${p.id})">Editar</button>
+          <button class="excluir" onclick="excluirProduto(${p.id})">Excluir</button>
         </div>
       `;
     });
   }
 
+  // Excluir produto
+  async function excluirProduto(id) {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    const { error } = await client.from("produtos").delete().eq("id", id);
+    if (error) { console.error(error); return; }
+    carregarProdutos(document.getElementById("filtro-status").value);
+  }
+
+  // Editar produto (preenche o formulário)
+  async function editarProduto(id) {
+    const { data, error } = await client.from("produtos").select("*").eq("id", id).single();
+    if (error) { console.error(error); return; }
+
+    document.getElementById("codigo").value = data.codigo;
+    document.getElementById("nome").value = data.nome;
+    document.getElementById("categoria").value = data.categoria;
+    document.getElementById("tamanho").value = data.tamanho;
+    document.getElementById("preco").value = data.preco;
+    document.getElementById("quantidade").value = data.quantidade;
+    document.getElementById("descricao").value = data.descricao;
+    document.getElementById("status").value = data.status;
+
+    // Guardar ID em atributo do form para saber se é edição
+    document.getElementById("form-produto").setAttribute("data-edit-id", id);
+  }
+
+  // Cadastro/edição
   document.getElementById("form-produto").addEventListener("submit", async (e) => {
     e.preventDefault();
     const codigo = document.getElementById("codigo").value;
@@ -132,12 +186,30 @@
       imagem_url = `${SUPABASE_URL}/storage/v1/object/public/fotos_produtos/${codigo}.${foto.name.split('.').pop()}`;
     }
 
-    const { error } = await client.from("produtos").insert([{
-      codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, imagem_url
-    }]);
-    if (error) { console.error(error); return; }
-    carregarProdutos();
+    const editId = document.getElementById("form-produto").getAttribute("data-edit-id");
+
+    if (editId) {
+      // Atualizar
+      const { error } = await client.from("produtos").update({
+        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, ...(imagem_url && { imagem_url })
+      }).eq("id", editId);
+      if (error) { console.error(error); return; }
+      document.getElementById("form-produto").removeAttribute("data-edit-id");
+    } else {
+      // Inserir novo
+      const { error } = await client.from("produtos").insert([{
+        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, imagem_url
+      }]);
+      if (error) { console.error(error); return; }
+    }
+
+    carregarProdutos(document.getElementById("filtro-status").value);
     e.target.reset();
+  });
+
+  // Filtro
+  document.getElementById("filtro-status").addEventListener("change", (e) => {
+    carregarProdutos(e.target.value);
   });
 
   carregarProdutos();
