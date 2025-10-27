@@ -1,0 +1,209 @@
+@charset "UTF-8";
+
+/* Local Fonts */
+@font-face {
+    font-family: Roboto;
+    src: url("../fonts/Roboto/Roboto-Regular.ttf")  format("truetype");
+    
+    font-family: 'Bebas Neue';
+    src: url("../fonts/Bebas_Neue/BebasNeue-Regular.ttf") format("truetype");
+
+    font-family: Comfortaa;
+    src: url("../fonts/Comfortaa/Comfortaa-VariableFont_wght.ttf") format("truetype");
+}
+
+/* Google Fonts import */
+@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+/* Variáveis CSS */
+:root {
+    --primary-color: #3F1041;
+    --secondary-color: #6F4F78;
+    --tertiary-color: #A677B4;
+    --bold-green: #00945E;
+    --light-green: #00B673;
+    --light-gray-color: #EEEEEE;
+
+    --logo-font: 'Righteous', sans-serif;
+    --emphasis-font:'Indie Flower', cursive;
+    --principal-font: 'Montserrat', sans-serif;
+    --content-font: Roboto, sans-serif;
+}
+
+/* Reset Geral */
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style-type: none;
+    box-sizing: border-box;
+    border-collapse: collapse;
+} 
+/* Fim reset */
+
+/* Fonte padrão do documento p/ unidade de medida rem*/
+html {
+    font-size: 100%;
+}
+
+body {
+    font-family: var(--content-font);
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--principal-font);
+}
+
+h2 {font-size: 2.2rem;}
+h3 {font-size: 2rem;}
+h4 {font-size: 1.8rem;}
+h5 {font-size: 1.5rem;}
+h6 {font-size: 1.2rem;}
+
+h1 {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+}
+
+/* Definindo plano de fundo SVG e cor branca para o conteúdo */
+.main-bg {
+    background-image: url("../../assets/images/confetti-doodles.svg");
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+.white-bg {
+    background-color: white;
+}
+
+.menu-desktop {
+    border-bottom: 1px solid var(--light-gray-color);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.308);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+div.menu-content {
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--secondary-color);
+}
+
+.menu-content ul{
+    display: flex;
+    flex-direction: row;
+}
+
+.menu-content ul li a {
+    display: block;
+    position: relative;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-variant: small-caps;
+    font-size: 0.86rem;
+    font-weight: 100;
+    padding: 1.25rem 1rem;
+    color: inherit;
+}
+
+.menu-content ul li a::after {
+    content: "";
+    position: absolute;
+    background-color: var(--bold-green);
+    background-size: contain;
+    width: 0;
+    height: 2px;
+    bottom: 5px;
+    left: 50%;
+    transition: all 250ms ease-in-out;
+}
+
+.menu-content ul li a:hover::after {
+    width: 100%;
+    left: 0;
+    display: inline-block;
+}
+
+.menu-spacing {
+    height: 3.62rem;
+}
+
+.decoration {
+    position: relative;
+    font-family: var(--emphasis-font);
+}
+
+/* 
+.decoration::before {
+    content: "";
+    position: absolute;
+    background-image: url("../../assets/images/spark-2.svg");
+    width: 30px;
+    height: 30px;
+    right: 50px;
+    z-index: -2;
+} */
+
+.logo {
+    position: relative;
+    font-family: var(--principal-font);
+    font-size: 2.2rem;
+    color: var(--secondary-color);
+    z-index: 1;
+}
+
+.logo a {
+    color: inherit;
+}
+
+/* Classe de contenção de conteúdo */
+.main-content {
+    max-width: 72rem;
+    margin: 0 auto ;
+    padding: 1rem;
+}
+
+.container {
+    min-height: 100vh;
+}
+
+/* Início produtos */
+#vitrine {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    margin: 0 auto;
+    padding: 1rem;
+    gap: 20px;
+}
+
+.item {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.item:hover {
+    transform: scale(1.03);
+}
+
+.item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+

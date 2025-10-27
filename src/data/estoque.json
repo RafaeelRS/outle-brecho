@@ -1,0 +1,32 @@
+[
+  {
+    "id": "CAM001",
+    "nome": "Camiseta básica preta",
+    "descricao": "Camiseta básica de algodão e poliester; hering",
+    "preco": 30,
+    "tamanho": "g",
+    "categoria": "Camiseta ",
+    "img_url": "https://i.postimg.cc/435f5sCs/camista-preta-masculina.png",
+    "status": "Disponível"
+  },
+  {
+    "id": "VES002",
+    "nome": "Vestido",
+    "descricao": "Vestido florado, algodão e poliester, bom estado",
+    "preco": 20,
+    "tamanho": 36,
+    "categoria": "Vestido",
+    "img_url": "https://i.postimg.cc/kX65d0Sv/vestido-longo-pretto.jpg",
+    "status": "Vendida"
+  },
+  {
+    "id": "BER003",
+    "nome": "Bermuda masculina bege",
+    "descricao": "bermuda com detalhes de uso nas bainhas, mas não muito perceptível",
+    "preco": 10,
+    "tamanho": "m",
+    "categoria": "Bermuda",
+    "img_url": "https://i.postimg.cc/BQrnZmc9/bermuda-tactel-masculina.jpg",
+    "status": "Reservada"
+  }
+]
