@@ -34,63 +34,68 @@
   <h2>Produtos</h2>
   <div id="lista-produtos"></div>
 
-  <script>
-    const SUPABASE_URL = "https://xvathneoefpexbgksmhg.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2YXRobmVvZWZwZXhiZ2tzbWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NzY1NTAsImV4cCI6MjA3NzE1MjU1MH0.xQhovSWNh33BGo256V1-pxOwQ0zjPZ89GpIppD5S1kA";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+<script>
+  const SUPABASE_URL = "https://xvathneoefpexbgksmhg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2YXRobmVvZWZwZXhiZ2tzbWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NzY1NTAsImV4cCI6MjA3NzE1MjU1MH0.xQhovSWNh33BGo256V1-pxOwQ0zjPZ89GpIppD5S1kA";
 
-    async function carregarProdutos() {
-      const { data, error } = await supabase.from("produtos").select("*");
-      if (error) { console.error(error); return; }
-      const lista = document.getElementById("lista-produtos");
-      lista.innerHTML = "";
-      data.forEach(p => {
-        lista.innerHTML += `
-          <div class="produto">
-            <img src="${p.imagem_url || ''}" alt="">
-            <strong>${p.nome}</strong><br>
-            Código: ${p.codigo}<br>
-            Categoria: ${p.categoria || ''}<br>
-            Tamanho: ${p.tamanho || ''}<br>
-            Preço: R$ ${p.preco}<br>
-            Quantidade: ${p.quantidade}<br>
-            Status: ${p.status}<br>
-            Descrição: ${p.descricao || ''}
-          </div>
-        `;
-      });
+  // inicializa corretamente
+  const { createClient } = supabase;
+  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function carregarProdutos() {
+    const { data, error } = await client.from("produtos").select("*");
+    if (error) { console.error(error); return; }
+    const lista = document.getElementById("lista-produtos");
+    lista.innerHTML = "";
+    data.forEach(p => {
+      lista.innerHTML += `
+        <div class="produto">
+          <img src="${p.imagem_url || ''}" alt="">
+          <strong>${p.nome}</strong><br>
+          Código: ${p.codigo}<br>
+          Categoria: ${p.categoria || ''}<br>
+          Tamanho: ${p.tamanho || ''}<br>
+          Preço: R$ ${p.preco}<br>
+          Quantidade: ${p.quantidade}<br>
+          Status: ${p.status}<br>
+          Descrição: ${p.descricao || ''}
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById("form-produto").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const codigo = document.getElementById("codigo").value;
+    const nome = document.getElementById("nome").value;
+    const categoria = document.getElementById("categoria").value;
+    const tamanho = document.getElementById("tamanho").value;
+    const preco = document.getElementById("preco").value;
+    const quantidade = document.getElementById("quantidade").value;
+    const descricao = document.getElementById("descricao").value;
+    const status = document.getElementById("status").value;
+    const foto = document.getElementById("foto").files[0];
+
+    let imagem_url = null;
+    if (foto) {
+      const { error: uploadError } = await client.storage
+        .from("fotos_produtos")
+        .upload(`${codigo}.${foto.name.split('.').pop()}`, foto, { upsert: true });
+      if (uploadError) { console.error(uploadError); return; }
+      imagem_url = `${SUPABASE_URL}/storage/v1/object/public/fotos_produtos/${codigo}.${foto.name.split('.').pop()}`;
     }
 
-    document.getElementById("form-produto").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const codigo = document.getElementById("codigo").value;
-      const nome = document.getElementById("nome").value;
-      const categoria = document.getElementById("categoria").value;
-      const tamanho = document.getElementById("tamanho").value;
-      const preco = document.getElementById("preco").value;
-      const quantidade = document.getElementById("quantidade").value;
-      const descricao = document.getElementById("descricao").value;
-      const status = document.getElementById("status").value;
-      const foto = document.getElementById("foto").files[0];
-
-      let imagem_url = null;
-      if (foto) {
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("fotos_produtos")
-          .upload(`${codigo}.${foto.name.split('.').pop()}`, foto, { upsert: true });
-        if (uploadError) { console.error(uploadError); return; }
-        imagem_url = `${SUPABASE_URL}/storage/v1/object/public/fotos_produtos/${codigo}.${foto.name.split('.').pop()}`;
-      }
-
-      const { error } = await supabase.from("produtos").insert([{
-        codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, imagem_url
-      }]);
-      if (error) { console.error(error); return; }
-      carregarProdutos();
-      e.target.reset();
-    });
-
+    const { error } = await client.from("produtos").insert([{
+      codigo, nome, categoria, tamanho, preco, quantidade, descricao, status, imagem_url
+    }]);
+    if (error) { console.error(error); return; }
     carregarProdutos();
-  </script>
+    e.target.reset();
+  });
+
+  carregarProdutos();
+</script>
+
 </body>
 </html>
