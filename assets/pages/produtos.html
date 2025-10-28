@@ -162,6 +162,22 @@
     // CADASTRAR/ATUALIZAR PRODUTO
     document.getElementById("form-produto").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      // Verifica se o usuário está logado
+      const { data: user } = await client.auth.getUser();
+      if (!user || !user.email) {
+        alert("Você precisa estar logado para cadastrar produtos.");
+        return;
+      }
+
+      // Verifica se o e-mail é autorizado
+      const emailsPermitidos = ['rafars.team22@gmail.com', 'brunaleticiags2709@gmail.com'];
+      if (!emailsPermitidos.includes(user.email)) {
+        alert("Seu e-mail não tem permissão para cadastrar produtos.");
+        return;
+      }
+
+      
       const codigo = document.getElementById("codigo").value;
       const nome = document.getElementById("nome").value;
       const categoria = document.getElementById("categoria").value;
@@ -172,18 +188,6 @@
       const descricao = document.getElementById("descricao").value;
       const status = document.getElementById("status").value
       const foto = document.getElementById("foto").files[0];
-
-      // VERIFICANDO SE O USUÁRIO PERMANECE AUTENTICADO APÓS O REDIRECIONAMENTO
-      const { data: user } = await client.auth.getUser();
-      console.log("Usuário logado:", user);
-
-      const { error } = await client.from("produtos").insert([{
-        codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status, imagem_url
-      }]);
-
-      if (error) {
-        console.error("Erro ao inserir produto:", error);
-      }
 
       let imagem_url = null;
       if (foto) {
