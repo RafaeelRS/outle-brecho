@@ -161,49 +161,86 @@
 
     // CADASTRAR/ATUALIZAR PRODUTO
     document.getElementById("form-produto").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    e.preventDefault();
 
-      const codigo = document.getElementById("codigo").value;
-      const nome = document.getElementById("nome").value;
-      const categoria = document.getElementById("categoria").value;
-      const sexo = document.getElementById("sexo").value;
-      const tamanho = document.getElementById("tamanho").value;
-      const preco = document.getElementById("preco").value;
-      const quantidade = document.getElementById("quantidade").value;
-      const descricao = document.getElementById("descricao").value;
-      const status = document.getElementById("status").value
-      const foto = document.getElementById("foto").files[0];
+    // Verifica sessão ativa
+    const { data: { session } } = await client.auth.getSession();
+    if (!session || !session.user) {
+      alert("Você precisa estar logado para cadastrar produtos.");
+      return;
+    }
 
-      let imagem_url = null;
-      if (foto) {
-        const { error: uploadError } = await client.storage
-          .from("fotos_produtos")
-          .upload(`${codigo}.${foto.name.split('.').pop()}`, foto, { upsert: true });
-        if (uploadError) { console.error(uploadError); return; }
-        imagem_url = `${SUPABASE_URL}/storage/v1/object/public/fotos_produtos/${codigo}.${foto.name.split('.').pop()}`;
+    // Verifica se o e-mail é autorizado
+    const emailsPermitidos = ['rafars.team22@gmail.com', 'brunaleticiags2709@gmail.com'];
+    if (!emailsPermitidos.includes(session.user.email)) {
+      alert("Seu e-mail não tem permissão para cadastrar produtos.");
+      return;
+    }
+
+    // Coleta dados do formulário
+    const codigo = document.getElementById("codigo").value;
+    const nome = document.getElementById("nome").value;
+    const categoria = document.getElementById("categoria").value;
+    const sexo = document.getElementById("sexo").value;
+    const tamanho = document.getElementById("tamanho").value;
+    const preco = document.getElementById("preco").value;
+    const quantidade = document.getElementById("quantidade").value;
+    const descricao = document.getElementById("descricao").value;
+    const status = document.getElementById("status").value;
+    const foto = document.getElementById("foto").files[0];
+
+    let imagem_url = null;
+    if (foto) {
+      // Upload da imagem no bucket fotos_produtos
+      const extensao = foto.name.split('.').pop();
+      const caminhoArquivo = `${codigo}.${extensao}`;
+
+      const { error: uploadError } = await client.storage
+        .from("fotos_produtos")
+        .upload(caminhoArquivo, foto, { upsert: true });
+
+      if (uploadError) {
+        console.error("Erro no upload da imagem:", uploadError);
+        alert("Erro ao enviar a imagem.");
+        return;
       }
 
-      const editId = document.getElementById("form-produto").getAttribute("data-edit-id");
+      imagem_url = `${SUPABASE_URL}/storage/v1/object/public/fotos_produtos/${caminhoArquivo}`;
+    }
 
-      if (editId) {
-        // Atualizar produto existente
-        const { error } = await client.from("produtos").update({
-          codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status,
-          ...(imagem_url && { imagem_url })
-        }).eq("id", editId);
-        if (error) { console.error(error); return; }
-        document.getElementById("form-produto").removeAttribute("data-edit-id");
-      } else {
-        // Inserir novo produto
-        const { error } = await client.from("produtos").insert([{
-          codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status, imagem_url
-        }]);
-        if (error) { console.error(error); return; }
+    const editId = document.getElementById("form-produto").getAttribute("data-edit-id");
+
+    if (editId) {
+      // Atualizar produto existente
+      const { error } = await client.from("produtos").update({
+        codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status,
+        ...(imagem_url && { imagem_url })
+      }).eq("id", editId);
+
+      if (error) {
+        console.error("Erro ao atualizar produto:", error);
+        alert("Erro ao atualizar produto.");
+        return;
       }
 
-      carregarProdutos();
-      e.target.reset();
-    });
+      document.getElementById("form-produto").removeAttribute("data-edit-id");
+    } else {
+      // Inserir novo produto
+      const { error } = await client.from("produtos").insert([{
+        codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status, imagem_url
+      }]);
+
+      if (error) {
+        console.error("Erro ao cadastrar produto:", error);
+        alert("Erro ao cadastrar produto.");
+        return;
+      }
+    }
+
+    carregarProdutos();
+    e.target.reset();
+});
+
   </script>
 </body>
 </html>
