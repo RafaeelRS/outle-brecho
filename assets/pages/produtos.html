@@ -163,21 +163,6 @@
     document.getElementById("form-produto").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // Verifica se o usuário está logado
-      const { data: user } = await client.auth.getUser();
-      if (!user || !user.email) {
-        alert("Você precisa estar logado para cadastrar produtos.");
-        return;
-      }
-
-      // Verifica se o e-mail é autorizado
-      const emailsPermitidos = ['rafars.team22@gmail.com', 'brunaleticiags2709@gmail.com'];
-      if (!emailsPermitidos.includes(user.email)) {
-        alert("Seu e-mail não tem permissão para cadastrar produtos.");
-        return;
-      }
-
-      
       const codigo = document.getElementById("codigo").value;
       const nome = document.getElementById("nome").value;
       const categoria = document.getElementById("categoria").value;
