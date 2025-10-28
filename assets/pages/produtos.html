@@ -108,6 +108,19 @@
       }
     });
 
+    // VERIFICANDO SE O USUÁRIO PERMANECE AUTENTICADO APÓS O REDIRECIONAMENTO
+    const { data: user } = await client.auth.getUser();
+    console.log("Usuário logado:", user);
+
+    const { error } = await client.from("produtos").insert([{
+      codigo, nome, categoria, sexo, tamanho, preco, quantidade, descricao, status, imagem_url
+    }]);
+
+    if (error) {
+      console.error("Erro ao inserir produto:", error);
+    }
+
+
     // LISTAR PRODUTOS
     async function carregarProdutos() {
       const { data, error } = await client.from("produtos").select("*");
