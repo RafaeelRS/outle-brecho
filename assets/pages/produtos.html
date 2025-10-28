@@ -76,7 +76,7 @@
   <!-- SCRIPT -->
   <script>
     const SUPABASE_URL = "https://xvathneoefpexbgksmhg.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2YXRobmVvZWZwZXhiZ2tzbWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NzY1NTAsImV4cCI6MjA3NzE1MjU1MH0.xQhovSWNh33BGo256V1-pxOwQ0zjPZ89GpIppD5S1kA";
+    const SUPABASE_ANON_KEY = "SUA-CHAVE-ANON";
     const { createClient } = supabase;
     const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -84,7 +84,7 @@
     document.getElementById("login-google").addEventListener("click", async () => {
       await client.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: "https://rafaeelrs.github.io/outle-brecho/assets/pages/produtos.html" }
+        options: { redirectTo: "https://rafaeelrs.github.io/outle-brecho/produtos.html" }
       });
     });
 
@@ -108,7 +108,7 @@
       }
     });
 
-    // FUNÇÃO LISTAR PRODUTOS
+    // LISTAR PRODUTOS
     async function carregarProdutos() {
       const { data, error } = await client.from("produtos").select("*");
       if (error) { console.error(error); return; }
@@ -169,10 +169,10 @@
       const preco = document.getElementById("preco").value;
       const quantidade = document.getElementById("quantidade").value;
       const descricao = document.getElementById("descricao").value;
-      const status = document.getElementById("status").value;
-      const foto = document.getElementById("foto").files[0];
+      const status = document.getElementById("status").value
+            const foto = document.getElementById("foto").files[0];
 
-            let imagem_url = null;
+      let imagem_url = null;
       if (foto) {
         const { error: uploadError } = await client.storage
           .from("fotos_produtos")
