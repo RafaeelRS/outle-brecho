@@ -234,6 +234,7 @@
       }
 
       document.getElementById("form-produto").removeAttribute("data-edit-id");
+      document.getElementById("btn-submit").textContent = "Cadastrar";
     } else {
       // Inserir novo produto
       const { error } = await client.from("produtos").insert([{
