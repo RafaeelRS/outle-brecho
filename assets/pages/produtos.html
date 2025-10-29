@@ -154,7 +154,7 @@
 
       if (error) { console.error(error); return; }
       if (!data) { console.warn("Nenhum produto encontrado com esse id"); return; }
-      
+
       if (error) { console.error(error); return; }
       document.getElementById("codigo").value = data.codigo;
       document.getElementById("nome").value = data.nome;
@@ -166,6 +166,7 @@
       document.getElementById("descricao").value = data.descricao;
       document.getElementById("status").value = data.status;
       document.getElementById("form-produto").setAttribute("data-edit-id", id);
+      document.getElementById("btn-submit").textContent = "Salvar alterações";
     }
 
     // CADASTRAR/ATUALIZAR PRODUTO
