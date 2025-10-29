@@ -145,7 +145,16 @@
 
     // EDITAR PRODUTO
     async function editarProduto(id) {
+      //ver qual id tá sendo passado
+      console.log("Chamando editarProduto com id:", id);
+      
       const { data, error } = await client.from("produtos").select("*").eq("id", id).single();
+      //Observando o retorno do SELECT
+      console.log("Resultado do select:", data, error);
+
+      if (error) { console.error(error); return; }
+      if (!data) { console.warn("Nenhum produto encontrado com esse id"); return; }
+      
       if (error) { console.error(error); return; }
       document.getElementById("codigo").value = data.codigo;
       document.getElementById("nome").value = data.nome;
